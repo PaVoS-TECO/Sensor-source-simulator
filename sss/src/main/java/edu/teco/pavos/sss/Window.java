@@ -24,6 +24,7 @@ public class Window implements ActionListener {
 	private JTextField urlField;
 	private boolean simulationActive;
 	private HashSet<Thread> threads = new HashSet<Thread>();
+	private HashSet<ThreadInfo> infos = new HashSet<ThreadInfo>();
 
 	/**
 	 * Default Constructor
@@ -38,14 +39,16 @@ public class Window implements ActionListener {
 	private void run() {
 		
 		this.threads = new HashSet<Thread>();
+		this.infos = new HashSet<ThreadInfo>();
 		
 		for (int la = 47; la < 55; la += 2) {
 			for (int lo = 4; lo < 16; lo += 4) {
             	final double fla = la;
             	final double flo = lo;
+                final ThreadInfo ti = new ThreadInfo(fla, flo);
+                this.infos.add(ti);
 				Thread aThread = new Thread(new Runnable() {
 		            public void run() {
-		                ThreadInfo ti = new ThreadInfo(fla, flo);
 		                new Simulator(ti, urlField.getText());
 		            }
 		        });
@@ -99,9 +102,17 @@ public class Window implements ActionListener {
 			
 		} else {
 			
+			for (ThreadInfo i : this.infos) {
+				i.setContinue(false);
+			}
 			this.button.setText("Start simulating Sensors");
 			for (Thread t : this.threads) {
-				t.interrupt();
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 		}

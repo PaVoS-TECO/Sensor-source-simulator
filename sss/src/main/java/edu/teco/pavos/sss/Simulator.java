@@ -33,7 +33,7 @@ public class Simulator {
 		int i = 0;
 		for (double la = 0; la < 2; la += 0.2) {
 			for (double lo = 0; lo < 4; lo += 0.4) {
-				String id = "" + this.info.getLat() + "-" + this.info.getLon() + "/loc" + i++;
+				String id = "" + this.info.getLat() + "-" + this.info.getLon() + "_loc" + i++;
 				JSONObject geo = new JSONObject();
 				geo.put("type", "Point");
 				JSONArray arr = new JSONArray();
@@ -52,28 +52,28 @@ public class Simulator {
 		for (String id : this.locations.keySet()) {
 			
 			JSONObject objL = new JSONObject();
-			objL.put("@iot.id", "Simulation/Location/" + id);
+			objL.put("@iot.id", "Simulation-Location-" + id);
 			objL.put("name", "L" + id);
 			objL.put("description", "A Location");
 			objL.put("encodingType", "application/vnd.geo+json");
 			objL.put("location", this.locations.get(id));
 		    String loc = objL.toJSONString();
-		    FrostSender.sendToFrostServer(this.url, loc);
+		    FrostSender.sendToFrostServer(this.url + "Locations", loc);
 		    
 		    JSONObject objT = new JSONObject();
-		    objT.put("@iot.id", "Simulation/Thing/" + id);
+		    objT.put("@iot.id", "Simulation-Thing-" + id);
 		    objT.put("name", "T" + id);
 		    objT.put("description", "A Thing");
 		    JSONObject location = new JSONObject();
-		    location.put("@iot.id", "Simulation/Thing/" + id);
+		    location.put("@iot.id", "Simulation-Location-" + id);
 		    JSONArray arr = new JSONArray();
 		    arr.add(location);
 	        objT.put("Locations", arr);
 		    String t = objT.toJSONString();
-		    FrostSender.sendToFrostServer(this.url, t);
+		    FrostSender.sendToFrostServer(this.url + "Things", t);
 		    
 		    JSONObject obj = new JSONObject();
-			obj.put("@iot.id", "Simulation/Datastream/" + id);
+			obj.put("@iot.id", "Simulation-Datastream-" + id);
 	        obj.put("name", "D" + id);
 	        obj.put("description", "A Datastream");
 	        obj.put("observationType", "Temp");
@@ -83,20 +83,20 @@ public class Simulator {
 			uom.put("definition", "http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#DegreeCelsius");
 	        obj.put("unitOfMeasurement", uom);
 	        JSONObject thing = new JSONObject();
-	        thing.put("@iot.id", "Simulation/Thing/" + id);
+	        thing.put("@iot.id", "Simulation-Thing-" + id);
 	        obj.put("Thing", thing);
 	        JSONObject observerProperty = new JSONObject();
-	        observerProperty.put("@iot.id", "Simulation/ObservedProperty");
+	        observerProperty.put("@iot.id", "Simulation-ObservedProperty");
 	        obj.put("ObservedProperty", observerProperty);
 	        JSONObject sensor = new JSONObject();
-	        sensor.put("@iot.id", "Simulation/Sensor");
+	        sensor.put("@iot.id", "Simulation-Sensor");
 	        obj.put("Sensor", sensor);
 		    String d = obj.toJSONString();
-		    FrostSender.sendToFrostServer(this.url, d);
+		    FrostSender.sendToFrostServer(this.url + "Datastreams", d);
 	        
 		}
 		
-		while (true) {
+		while (this.info.continueLoop()) {
 			
 			this.value += this.getRandom();
 			
@@ -111,10 +111,10 @@ public class Simulator {
 		        obj.put("result", this.value);
 		        obj.put("resultTime", t);
 		        JSONObject dataStream = new JSONObject();
-		        dataStream.put("@iot.id", "Simulation/Datastream/" + id);
+		        dataStream.put("@iot.id", "Simulation-Datastream-" + id);
 		        obj.put("Datastream", dataStream);
 		        String json = obj.toJSONString();
-		        FrostSender.sendToFrostServer(this.url, json);
+		        FrostSender.sendToFrostServer(this.url + "Observations", json);
 				
 			}
 			
@@ -146,21 +146,21 @@ public class Simulator {
 	public static void prepareAll(String url) {
 		
 		JSONObject objOP = new JSONObject();
-		objOP.put("@iot.id", "Simulation/ObservedProperty");
+		objOP.put("@iot.id", "Simulation-ObservedProperty");
 		objOP.put("name", "TemperatureSimulation");
 		objOP.put("description", "TempS");
 		objOP.put("definition", "Just for testing purposes");
         String op = objOP.toJSONString();
-        FrostSender.sendToFrostServer(url, op);
+        FrostSender.sendToFrostServer(url + "ObservedProperties", op);
         
         JSONObject objS = new JSONObject();
-        objS.put("@iot.id", "Simulation/Sensor");
+        objS.put("@iot.id", "Simulation-Sensor");
         objS.put("name", "Simulated Sensor");
         objS.put("description", "Simlulated temperature sensor");
         objS.put("encodingType", "application/pdf");
         objS.put("metadata", "https://cdn-shop.adafruit.com/datasheets/DHT22.pdf");
         String s = objS.toJSONString();
-        FrostSender.sendToFrostServer(url, s);
+        FrostSender.sendToFrostServer(url + "Sensors", s);
 		
 	}
 

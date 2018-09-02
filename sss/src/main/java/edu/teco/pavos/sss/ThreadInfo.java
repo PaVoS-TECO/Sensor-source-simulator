@@ -8,9 +8,7 @@ public class ThreadInfo {
 	
 	private double lat;
 	private double lon;
-	
-	private double latD = 2;
-	private double lonD = 4;
+	private boolean shouldContinue = true;
 
 	/**
 	 * Default Constructor
@@ -20,6 +18,22 @@ public class ThreadInfo {
 	public ThreadInfo(double lat, double lon) {
 		this.lat = lat;
 		this.lon = lon;
+	}
+	
+	/**
+	 * Getter for remaining in loop
+	 * @return boolean
+	 */
+	public boolean continueLoop() {
+		return this.shouldContinue;
+	}
+	
+	/**
+	 * Setter for remaining in loop
+	 * @param b boolean
+	 */
+	public void setContinue(boolean b) {
+		this.shouldContinue = b;
 	}
 	
 	/**
